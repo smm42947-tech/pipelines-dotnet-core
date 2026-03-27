@@ -2,28 +2,30 @@ trigger:
 - main
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
-- task: UseDotNet@2
+# ✅ Install Java
+- task: JavaToolInstaller@0
   inputs:
-    packageType: 'sdk'
-    version: '8.x'
+    versionSpec: '17'      # or 11 if needed
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
 
-# ✅ Restore only the selected project
-- script: dotnet restore "examples/dotnetcoreapp/dotnetcoreapp.csproj"
-  displayName: 'Restore packages'
+# ✅ Build using Maven
+- task: Maven@4
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'package'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/*.xml'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17'
+    mavenVersionOption: 'Default'
+  displayName: 'Build with Maven'
 
-# ✅ Build selected project
-- script: dotnet build "examples/dotnetcoreapp/dotnetcoreapp.csproj" --configuration Release --no-restore
-  displayName: 'Build'
-
-# ✅ Test (if the selected project has tests; otherwise skip)
-- script: dotnet test --configuration Release
-  displayName: 'Test'
-
-# ✅ Publish artifacts
+# ✅ Publish artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'examples/dotnetcoreapp/bin/Release'
+    PathtoPublish: 'target'
     ArtifactName: 'drop'
