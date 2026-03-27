@@ -5,26 +5,19 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
-- task: NuGetToolInstaller@1
-  displayName: 'Install NuGet'
-
-- task: NuGetCommand@2
+- task: UseDotNet@2
+  displayName: "Install .NET SDK"
   inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
-  displayName: 'Restore NuGet Packages'
+    version: '7.x'   # or 6.x depending on your project
 
-- task: VSBuild@1
-  displayName: 'Build Solution'
-  inputs:
-    solution: '**/*.sln'
-    vsVersion: 'latest'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebConfigTransform=true'
-    platform: 'Any CPU'
-    configuration: 'Release'
+# ✅ Restore using csproj instead of .sln
+- script: dotnet restore <path-to-your-csproj>
+  displayName: "Restore NuGet Packages"
 
-- task: VSTest@2
-  displayName: 'Run Tests'
-  inputs:
-    platform: 'Any CPU'
-    configuration: 'Release'
+# ✅ Build using csproj
+- script: dotnet build <path-to-your-csproj> -c Release --no-restore
+  displayName: "Build Project"
+
+# ✅ Run tests (optional)
+- script: dotnet test <path-to-your-test-csproj> -c Release --no-build
+  displayName: "Run Tests"
