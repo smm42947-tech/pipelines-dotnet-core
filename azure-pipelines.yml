@@ -6,18 +6,20 @@ pool:
 
 steps:
 - task: UseDotNet@2
-  displayName: "Install .NET SDK"
   inputs:
-    version: '7.x'   # or 6.x depending on your project
+    packageType: 'sdk'
+    version: '8.x'
 
-# ✅ Restore using csproj instead of .sln
-- script: dotnet restore <path-to-your-csproj>
-  displayName: "Restore NuGet Packages"
+- script: dotnet restore
+  displayName: 'Restore packages'
 
-# ✅ Build using csproj
-- script: dotnet build <path-to-your-csproj> -c Release --no-restore
-  displayName: "Build Project"
+- script: dotnet build --configuration Release --no-restore
+  displayName: 'Build'
 
-# ✅ Run tests (optional)
-- script: dotnet test <path-to-your-test-csproj> -c Release --no-build
-  displayName: "Run Tests"
+- script: dotnet test --configuration Release --no-build --logger trx
+  displayName: 'Test'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'bin/Release'
+    ArtifactName: 'drop'
