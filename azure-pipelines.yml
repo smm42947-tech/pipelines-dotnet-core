@@ -10,16 +10,20 @@ steps:
     packageType: 'sdk'
     version: '8.x'
 
-- script: dotnet restore
+# ✅ Restore only the selected project
+- script: dotnet restore "examples/dotnetcoreapp/dotnetcoreapp.csproj"
   displayName: 'Restore packages'
 
-- script: dotnet build --configuration Release --no-restore
+# ✅ Build selected project
+- script: dotnet build "examples/dotnetcoreapp/dotnetcoreapp.csproj" --configuration Release --no-restore
   displayName: 'Build'
 
-- script: dotnet test --configuration Release --no-build --logger trx
+# ✅ Test (if the selected project has tests; otherwise skip)
+- script: dotnet test --configuration Release
   displayName: 'Test'
 
+# ✅ Publish artifacts
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'bin/Release'
+    PathtoPublish: 'examples/dotnetcoreapp/bin/Release'
     ArtifactName: 'drop'
