@@ -5,14 +5,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# ✅ Install Java
 - task: JavaToolInstaller@0
   inputs:
-    versionSpec: '17'      # or 11 if needed
+    versionSpec: '17'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
 
-# ✅ Build using Maven
 - task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
@@ -22,10 +20,3 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.17'
     mavenVersionOption: 'Default'
-  displayName: 'Build with Maven'
-
-# ✅ Publish artifact
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'target'
-    ArtifactName: 'drop'
